@@ -1,7 +1,21 @@
 package stg.payit.wallet.registration;
 
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
 import java.util.Optional;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -12,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.servlet.view.RedirectView;
 
 import lombok.AllArgsConstructor;
@@ -28,6 +43,8 @@ import stg.payit.wallet.responseHandler.ResponseHandler;
 
 @AllArgsConstructor
 public class RegistrationController {
+	private static final String CIPHER_ALGORITHM = "AES/CBC/ISO10126PADDING";
+	static byte[] iv = hexStringToByteArray("48E53E0639A76C5A5E0C5BC9E3A91538");
 
 	private final RegistrationService registrationService;
 	private final AppUserRepository appUserRepository;
@@ -43,6 +60,32 @@ public class RegistrationController {
 	}
 
 	
+	@GetMapping("session")
+	public String sessionId() throws ParseException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
+		
+		
+	
+		String sessionid = RequestContextHolder.currentRequestAttributes().getSessionId();
+		sessionid = sessionid.replaceAll("_","A");
+		sessionid = sessionid.replaceAll("-","B");
+		sessionid = sessionid.substring(0, 32);
+		
+		
+		Key secretKey = parseSecretKey(sessionid);
+	
+
+		Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
+		cipher.init(Cipher.ENCRYPT_MODE, secretKey, new IvParameterSpec(iv));
+
+		byte[] encryptedMessage = cipher.doFinal("oubada".getBytes());
+		byte[] encryptedByteValue = new Base64().encode(encryptedMessage);
+
+		String encryptedValue = new String(encryptedByteValue);
+		System.out.println("------------------ENCRYPTE MESSAGE ---------------");
+		System.out.println(encryptedValue);
+		return encryptedValue;
+	
+	}
 	
 	
 	@PutMapping("changepassword")
@@ -142,5 +185,55 @@ public class RegistrationController {
 		return appUserService.retierSolde(phone_number,montant);
 	}
 	
+	public static SecretKey parseSecretKey(String secretKey) throws ParseException {
+		return new SecretKeySpec(stringToByteArray(secretKey), "AES");
+	}
+	
+	 public static byte[] hexStringToByteArray(String s) {
+	        int len = s.length();
+	        byte[] data = new byte[len / 2];
+	        for (int i = 0; i < len; i += 2) {
+	            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+	                                 + Character.digit(s.charAt(i+1), 16));
+	        }
+	        return data;
+	    }
+	 public static byte[] stringToByteArray(String hexaString) throws ParseException {
+			// the padding shouldn't be used, so a random one was chosen
+			return stringToByteArray(hexaString, hexaString.length() / 2, (byte) 0xFF);
+		}
 
+	 public static byte[] stringToByteArray(String hexaString, int resultArraySize, byte padding) throws ParseException {
+			final int HEXA_RADIX = 36;
+			int length = hexaString.length();
+			if (length % 2 == 0) {
+				length /= 2;
+				if (length <= resultArraySize) {
+					byte[] numbers = new byte[resultArraySize];
+					int i;
+					// filling the array
+					for (i = 0; i < length; i++) {
+						// the following line will trigger a NumberFormatException if str contains a non
+						// 0-9 A-F character
+						try {
+							int j = Integer.parseInt(hexaString.substring(2 * i, 2 * i + 2), HEXA_RADIX);
+							numbers[i] = (byte) (j & 0xFF);
+						} catch (NumberFormatException ex) {
+							throw new ParseException(ex.getMessage(), i);
+						}
+					}
+					// padding
+					for (; i < resultArraySize; i++) {
+						numbers[i] = padding;
+					}
+					return numbers;
+				} else {
+					throw new ParseException(
+							"the resulting array size is too big compared to the min size specified in the parameters", 0);
+				}
+			} else {
+				throw new ParseException("string length must be even", 0);
+			}
+		}
+		
 }
