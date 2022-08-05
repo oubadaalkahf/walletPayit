@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
@@ -36,7 +37,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers("/h2-console/**").permitAll();
         http.authorizeRequests().antMatchers("/login/**").permitAll();
      
-       http.authorizeRequests().antMatchers("/login").permitAll();
         http
                 .csrf().disable()
                 .authorizeRequests()
@@ -57,7 +57,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public DaoAuthenticationProvider daoAuthenticationProvider() {
         DaoAuthenticationProvider provider =
                 new DaoAuthenticationProvider();
-        provider.setPasswordEncoder(bCryptPasswordEncoder);
+        provider.setPasswordEncoder(passwordEncoderr());
         provider.setUserDetailsService(appUserService);
         return provider;
     }
@@ -68,4 +68,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     	
     }
 
+    
+    @Bean
+    public static NoOpPasswordEncoder passwordEncoderr() {
+      return (NoOpPasswordEncoder) NoOpPasswordEncoder.getInstance();
+    }
 }

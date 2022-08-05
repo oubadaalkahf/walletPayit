@@ -34,8 +34,7 @@ public class RegistrationService {
 			return ResponseHandler.generateResponseString("Email Not Valid", HttpStatus.OK);
 		}
 		AppUser user = new AppUser(request.getFirstName(), request.getLastName(), request.getEmail(),
-				request.getPassword(), AppUserRole.USER,request.getPhoneNumber(),request.getCin()
-
+				request.getPassword(), AppUserRole.USER,request.getPhoneNumber(),request.getCin(),request.getGender()
 		);
 		String token = appUserService.signUpUser(user);
 		String link = "http://3.217.215.70:8081/wallet/registration/confirm?token=" + token;

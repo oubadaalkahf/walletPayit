@@ -5,6 +5,7 @@ import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
+import java.util.Iterator;
 import java.util.Optional;
 
 import javax.crypto.BadPaddingException;
@@ -14,6 +15,8 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.http.HttpStatus;
@@ -60,32 +63,45 @@ public class RegistrationController {
 	}
 
 	
-	@GetMapping("session")
-	public String sessionId() throws ParseException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
+	@GetMapping("sessionId")
+	public String sessionIds() throws ParseException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
 		
 		
 	
 		String sessionid = RequestContextHolder.currentRequestAttributes().getSessionId();
-		sessionid = sessionid.replaceAll("_","A");
-		sessionid = sessionid.replaceAll("-","B");
-		sessionid = sessionid.substring(0, 32);
 		
 		
-		Key secretKey = parseSecretKey(sessionid);
+		 byte[] decodedKey = new Base64(true).decode("_T_9JPGSeFFXr8EpOst4dJSOgfTaDCtD");
+		 Key secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
+//		Key secretKey = parseSecretKey(sessionid);
 	
 
 		Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
 		cipher.init(Cipher.ENCRYPT_MODE, secretKey, new IvParameterSpec(iv));
 
-		byte[] encryptedMessage = cipher.doFinal("oubada".getBytes());
+		byte[] encryptedMessage = cipher.doFinal("8a5ea65070b3af3c152847ba88772b69367e4923".getBytes());
 		byte[] encryptedByteValue = new Base64().encode(encryptedMessage);
 
 		String encryptedValue = new String(encryptedByteValue);
 		System.out.println("------------------ENCRYPTE MESSAGE ---------------");
 		System.out.println(encryptedValue);
-		return encryptedValue;
+		return encryptedValue + "---------"+sessionid;
 	
 	}
+
+	
+	@GetMapping("session")
+	public String sessionId() throws ParseException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
+		String sessionid = RequestContextHolder.currentRequestAttributes().getSessionId();
+		sessionid = sessionid.replaceAll("-","");
+		sessionid = sessionid.replaceAll("/","");
+		sessionid = sessionid.replaceAll("_","");
+		sessionid = sessionid.substring(0,32);	
+		return sessionid;
+	
+	}
+	
+	
 	
 	
 	@PutMapping("changepassword")

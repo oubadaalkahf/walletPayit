@@ -20,6 +20,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -100,11 +102,23 @@ public class AppUserService implements UserDetailsService {
          
             return "User already Exist";
         }
+//
+//        String encodedPassword = bCryptPasswordEncoder
+//                .encode(appUser.getPassword());
+        MessageDigest mDigest=null;
+		try {
+			mDigest = MessageDigest.getInstance("SHA1");
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        byte[] result = mDigest.digest(appUser.getPassword().getBytes());
+        StringBuffer encodedPassword = new StringBuffer();
+        for (int i = 0; i < result.length; i++) {
+        	encodedPassword.append(Integer.toString((result[i] & 0xff) + 0x100, 16).substring(1));
+        }
 
-        String encodedPassword = bCryptPasswordEncoder
-                .encode(appUser.getPassword());
-
-        appUser.setPassword(encodedPassword);
+        appUser.setPassword(encodedPassword.toString());
 
         appUserRepository.save(appUser);
 

@@ -53,9 +53,9 @@ public class AppUser implements UserDetails {
 	
 	private Boolean locked = false;
 	private Boolean enabled = false;
-
+	private String gender;
 	public AppUser(String firstName, String lastName, String email, String password, AppUserRole appUserRole,
-			String phoneNumber,String cin) {
+			String phoneNumber,String cin, String gender) {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
@@ -66,6 +66,7 @@ public class AppUser implements UserDetails {
 	//this.rib="SGM"+randomString(10);
 		this.solde = 0;		
 		this.cin = cin;
+		this.gender=gender;
 	}
 
 	@Override

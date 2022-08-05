@@ -16,6 +16,7 @@ public class RegistrationRequest {
     private final String password;
     private final String phoneNumber;
     private final String cin;
+    private final String gender;
     private final String newPassword;
     
 }
