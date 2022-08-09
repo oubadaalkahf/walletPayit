@@ -1,12 +1,16 @@
 package stg.payit.wallet.registration;
 
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -15,7 +19,9 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.codec.binary.Base64;
@@ -36,7 +42,10 @@ import lombok.AllArgsConstructor;
 import stg.payit.wallet.appuser.AppUser;
 import stg.payit.wallet.appuser.AppUserRepository;
 import stg.payit.wallet.appuser.AppUserService;
+import stg.payit.wallet.registration.RegistrationService;
 import stg.payit.wallet.responseHandler.ResponseHandler;
+
+
 
 
 
@@ -71,7 +80,7 @@ public class RegistrationController {
 		String sessionid = RequestContextHolder.currentRequestAttributes().getSessionId();
 		
 		
-		 byte[] decodedKey = new Base64(true).decode("_T_9JPGSeFFXr8EpOst4dJSOgfTaDCtD");
+		 byte[] decodedKey = new Base64(true).decode("oJ8z4yvbYB6r_dQ5EP080djUyWLBExkM");
 		 Key secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
 //		Key secretKey = parseSecretKey(sessionid);
 	
@@ -91,17 +100,35 @@ public class RegistrationController {
 
 	
 	@GetMapping("session")
-	public String sessionId() throws ParseException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
-		String sessionid = RequestContextHolder.currentRequestAttributes().getSessionId();
-		sessionid = sessionid.replaceAll("-","");
-		sessionid = sessionid.replaceAll("/","");
-		sessionid = sessionid.replaceAll("_","");
-		sessionid = sessionid.substring(0,32);	
-		return sessionid;
+	public String sessionId(HttpServletRequest request) throws ParseException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
+		//HttpSession session = request.getSession();
+	//	 System.out.println(session.getAttribute("UserName"));
+		
 	
+//		 byte[] decodedKey = new Base64(true).decode("ZUXRxkanVL7FATY-zT41XqiV0WuCrF9LFuDfVZbB".substring(0,32));
+//		 Key secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
+//		byte[] s = new Base64().encode(decodedKey);
+//		String ss = new String(s);
+		
+		HttpSession session = request.getSession();
+		String uuid = UUID.randomUUID().toString().replaceAll("-","");
+		System.out.println(uuid);
+		session.setAttribute("uuid",uuid);
+		return uuid;
+		}
+	
+	@GetMapping("sessionTest")
+	public String session(HttpServletRequest request,HttpServletResponse response) {
+		HttpSession session = request.getSession();
+		
+		String uuid = UUID.randomUUID().toString().replaceAll("-","");
+		String uuids = UUID.randomUUID().toString().replaceAll("-","");
+		System.out.println(uuid);
+		System.out.println(uuids);
+		session.setAttribute("uuid",uuid);
+		return uuid;
+		
 	}
-	
-	
 	
 	
 	@PutMapping("changepassword")

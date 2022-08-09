@@ -72,14 +72,17 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	
 		String phone_number = request.getParameter("phoneNumber");
 		String password = request.getParameter("password");
-		
-		String sessionid = RequestContextHolder.currentRequestAttributes().getSessionId();
-		sessionid = sessionid.replaceAll("-","");
-		sessionid = sessionid.replaceAll("/","");
-		sessionid = sessionid.replaceAll("_","");
-		sessionid = sessionid.substring(0,32);
-			
-		String pwd = decrypt(password,sessionid);
+
+		String session = request.getSession().getAttribute("uuid").toString();
+		 byte[] decodedKey = new Base64(true).decode(session);
+		 Key secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
+		byte[] s = new Base64().encode(decodedKey);
+		String ss = new String(s);
+			if(ss.contains("/"))
+			{
+				ss = ss.replaceAll("/", "B");
+			}
+		String pwd = decrypt(password,ss);
 		 System.out.println(pwd);
 		 UsernamePasswordAuthenticationToken authenticationToken=null;
 		
