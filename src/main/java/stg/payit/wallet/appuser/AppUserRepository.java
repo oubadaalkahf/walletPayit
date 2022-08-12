@@ -15,7 +15,6 @@ import java.util.Optional;
 public interface AppUserRepository
         extends JpaRepository<AppUser, Long> {
 	
-	 
     
 	Optional<AppUser> findByCin(String cin);
 
@@ -36,4 +35,6 @@ public interface AppUserRepository
     @Query("SELECT u FROM AppUser u WHERE u.fcm_token IS NOT NULL")
     List<AppUser> finAllUsers();
     
+    @Query("SELECT u FROM AppUser u WHERE u.gender= ?1")
+	 List<AppUser> findBygenderHomme(String gender);
 }

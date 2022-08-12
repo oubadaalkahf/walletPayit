@@ -58,6 +58,15 @@ public class AppUserService implements UserDetailsService {
         		appUserRepository.findByEmail(email)); 
                
     }
+    
+    
+    
+    
+	public List<AppUser> getUsersByGender(String gender) {
+		return appUserRepository.findBygenderHomme(gender);
+		
+	}
+    
     public ResponseEntity<Object> loadUserByPhoneNumber(String phone_number)
 
             {
@@ -178,11 +187,10 @@ public class AppUserService implements UserDetailsService {
 
 	public ResponseEntity<Object> changePassword(Optional<AppUser> user, RegistrationRequest request) {
 		System.out.println("CHANGE PASSWORD");
-		System.out.println(bCryptPasswordEncoder.encode(request.getPassword()));
+	
 		System.out.println(user.get().getPassword());
-		if (bCryptPasswordEncoder.matches(request.getPassword(), user.get().getPassword())) {
-			user.get().setPassword(bCryptPasswordEncoder.encode(request.getNewPassword()));
-
+		if (request.getPassword().equals(user.get().getPassword()) ) {
+			user.get().setPassword(request.getNewPassword());
 			appUserRepository.save(user.get());
 			return ResponseHandler.generateResponseString("password has been changed", HttpStatus.OK);
 		}else

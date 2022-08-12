@@ -8,6 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -128,6 +129,12 @@ public class RegistrationController {
 		session.setAttribute("uuid",uuid);
 		return uuid;
 		
+	}
+	
+	
+	@GetMapping("userbygender")
+	public List<AppUser> getUsersByGender(@RequestParam(name = "gender") String gender){
+		return appUserService.getUsersByGender(gender);
 	}
 	
 	
@@ -278,5 +285,38 @@ public class RegistrationController {
 				throw new ParseException("string length must be even", 0);
 			}
 		}
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
 		
 }

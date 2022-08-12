@@ -2,6 +2,7 @@ package stg.payit.wallet.registration;
 
 import lombok.AllArgsConstructor;
 import stg.payit.wallet.appuser.AppUser;
+import stg.payit.wallet.appuser.AppUserRepository;
 import stg.payit.wallet.appuser.AppUserRole;
 import stg.payit.wallet.appuser.AppUserService;
 import stg.payit.wallet.email.EmailSender;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 @CrossOrigin("*")
 @Service
@@ -43,7 +45,7 @@ public class RegistrationService {
 		return ResponseHandler.generateResponse("Registrated!", HttpStatus.OK,user);
 	}
 
-	
+
 	
 	
 	@Transactional
